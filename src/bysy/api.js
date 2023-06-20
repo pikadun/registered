@@ -101,6 +101,7 @@ const getDoctors = async () => {
     mRandstr: ''
   }
   const result = await axios.post(url, postData)
+  console.log('get department doctors')
   if (!result) {
     return []
   }
@@ -110,7 +111,7 @@ const getDoctors = async () => {
     throw new Error(data)
   }
   doctors.data = data.data
-  doctors.expire = Date.now() + 1000 * 60 * 60 * 2
+  doctors.expire = Date.now() + 1000 * 60 * 30
   return data.data
 }
 

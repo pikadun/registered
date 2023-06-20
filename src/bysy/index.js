@@ -4,6 +4,10 @@ const exec = require('child_process').exec
 
 const oldlog = console.log
 console.log = (msg) => {
+  if (typeof msg !== 'string') {
+    msg = JSON.stringify(msg)
+  }
+
   oldlog(new Date().toLocaleString(), msg)
 }
 
@@ -56,7 +60,7 @@ const dodo = async () => {
       }
     }
   }
-  const nextTime = random(2 * 60 * 1000, 3 * 60 * 1000)
+  const nextTime = random(1 * 60 * 1000, 2 * 60 * 1000)
   console.log(`下次检查时间：${nextTime / 1000}秒`)
   // 休息一下
   setTimeout(dodo, nextTime)
