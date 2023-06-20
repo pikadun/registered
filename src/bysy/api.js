@@ -3,7 +3,8 @@ const crypto = require('crypto-js')
 const cache = require('./cache')
 
 const axios = Axios.create({
-  baseURL: 'https://pat2.puh3.net.cn'
+  baseURL: 'https://pat2.puh3.net.cn',
+  timeout: 3000
 })
 
 axios.interceptors.request.use(async config => {
@@ -13,6 +14,8 @@ axios.interceptors.request.use(async config => {
   config.headers = Object.assign({}, config.headers, getHeaders())
   return config
 })
+
+axios.interceptors.response.use(response => response, console.error)
 
 const decode = (data, ivData, keyData) => {
   const key = crypto.enc.Utf8.parse(keyData)
@@ -86,9 +89,16 @@ const getDoctors = async () => {
     mTicket: '',
     mRandstr: ''
   }
-  const { data } = await axios.post(url, postData)
-  const result = decode(data, cache.get(cache.KEYS.token), postData.userId)
-  return result.data
+  const result = await axios.post(url, postData)
+  if (!result) {
+    return []
+  }
+
+  const data = decode(result.data, cache.get(cache.KEYS.token), postData.userId)
+  if (data.code !== '200') {
+    throw new Error(data.msg)
+  }
+  return data.data
 }
 
 const getSchedules = async (doctorId) => {
@@ -100,9 +110,16 @@ const getSchedules = async (doctorId) => {
     hospitalName: '北京大学第三医院',
     group_name: ''
   }
-  const { data } = await axios.post(url, postData)
-  const result = decode(data, cache.get(cache.KEYS.token), postData.userId)
-  return result.data
+  const result = await axios.post(url, postData)
+  if (!result) {
+    return []
+  }
+
+  const data = decode(result.data, cache.get(cache.KEYS.token), postData.userId)
+  if (data.code !== '200') {
+    throw new Error(data.msg)
+  }
+  return data.data
 }
 
 module.exports = {

@@ -1,10 +1,15 @@
 const API = require('./api')
 const axios = require('axios').default
+const exec = require('child_process').exec
 
 const oldlog = console.log
-
 console.log = (msg) => {
   oldlog(new Date().toLocaleString(), msg)
+}
+
+const stop = () => {
+  console.log('pm2 stop 0')
+  exec('pm2 stop 0')
 }
 
 const isValid = (visit) => {
@@ -45,7 +50,7 @@ const dodo = async () => {
         const msg = `${visit.doctorName} ${visit.visitDate} ${visit.amPm === 'a' ? '上午' : '下午'}`
         if (isValid(visit)) {
           await notify(`${msg} 有号`)
-          process.exit(0)
+          stop()
         }
         console.log(`${msg} 无号`)
       }
@@ -58,3 +63,15 @@ const dodo = async () => {
 }
 
 dodo()
+
+process.on('uncaughtException', async (err) => {
+  console.error(err)
+  await notify('系统异常')
+  stop()
+})
+
+process.on('unhandledRejection', async (err) => {
+  console.error(err)
+  await notify('系统异常')
+  stop()
+})
