@@ -37,6 +37,7 @@ const notify = async (content) => {
 }
 
 const dodo = async () => {
+  console.log('---------- 开始检查 ----------')
   await API.login()
   const doctors = await API.getDoctors()
   for (const doctor of doctors) {
@@ -62,6 +63,7 @@ const dodo = async () => {
   }
   const nextTime = random(1 * 60 * 1000, 2 * 60 * 1000)
   console.log(`下次检查时间：${nextTime / 1000}秒`)
+  console.log('---------- 检查结束 ----------')
   // 休息一下
   setTimeout(dodo, nextTime)
 }
