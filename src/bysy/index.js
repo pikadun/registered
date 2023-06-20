@@ -56,7 +56,7 @@ const dodo = async () => {
       }
     }
   }
-  const nextTime = random(60 * 1000, 3 * 60 * 1000)
+  const nextTime = random(2 * 60 * 1000, 3 * 60 * 1000)
   console.log(`下次检查时间：${nextTime / 1000}秒`)
   // 休息一下
   setTimeout(dodo, nextTime)
@@ -66,12 +66,12 @@ dodo()
 
 process.on('uncaughtException', async (err) => {
   console.error(err)
-  await notify('系统异常')
+  await notify(err.message)
   stop()
 })
 
 process.on('unhandledRejection', async (err) => {
   console.error(err)
-  await notify('系统异常')
+  await notify(err.message)
   stop()
 })

@@ -15,7 +15,9 @@ axios.interceptors.request.use(async config => {
   return config
 })
 
-axios.interceptors.response.use(response => response, console.error)
+axios.interceptors.response.use(response => response, error => {
+  console.error(error.message)
+})
 
 const decode = (data, ivData, keyData) => {
   const key = crypto.enc.Utf8.parse(keyData)
@@ -70,7 +72,7 @@ const login = async () => {
   const params = { username, password }
   const { data } = await axios.post(url, params)
   if (data.code !== '200') {
-    throw new Error(data.msg)
+    throw new Error(data)
   }
   console.log('login success')
   cache.set(cache.KEYS.userid, data.data.userId)
@@ -78,7 +80,16 @@ const login = async () => {
   cache.set(cache.KEYS.usersig, data.data.usersig)
 }
 
+const doctors = {
+  data: null,
+  expire: Date.now()
+}
+
 const getDoctors = async () => {
+  if (doctors.data && doctors.expire > Date.now()) {
+    return doctors.data
+  }
+
   const url = '/api/v1/appointment/getDepartmentDoctors'
   const postData = {
     departmentAppointmentId: departmentId,
@@ -96,8 +107,10 @@ const getDoctors = async () => {
 
   const data = decode(result.data, cache.get(cache.KEYS.token), postData.userId)
   if (data.code !== '200') {
-    throw new Error(data.msg)
+    throw new Error(data)
   }
+  doctors.data = data.data
+  doctors.expire = Date.now() + 1000 * 60 * 60 * 2
   return data.data
 }
 
@@ -117,7 +130,7 @@ const getSchedules = async (doctorId) => {
 
   const data = decode(result.data, cache.get(cache.KEYS.token), postData.userId)
   if (data.code !== '200') {
-    throw new Error(data.msg)
+    throw new Error(data)
   }
   return data.data
 }
