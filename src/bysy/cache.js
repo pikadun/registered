@@ -26,6 +26,11 @@ class Cache {
     this.#cache[key] = JSON.stringify(value)
     fs.writeFileSync(this.#filePath, JSON.stringify(this.#cache))
   }
+
+  clear () {
+    this.#cache = {}
+    fs.writeFileSync(this.#filePath, JSON.stringify(this.#cache))
+  }
 }
 
 module.exports = new Cache()

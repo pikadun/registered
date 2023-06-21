@@ -38,8 +38,8 @@ const isTokenExpired = () => {
     const parts = token.split('.')
     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString())
     const exp = payload.exp
-    const now = Math.floor(Date.now() / 1000) - 60
-    return now > exp
+    const now = Math.floor(Date.now() / 1000)
+    return now > (exp - 60)
   } catch (e) {
     return true
   }
@@ -64,7 +64,8 @@ const login = async () => {
   if (!isTokenExpired()) {
     return
   }
-
+  console.log('token 过期，重新登录')
+  cache.clear()
   const aesKey = 'BEIYISAN'
   const username = crypto.AES.encrypt('18840822261', aesKey).toString()
   const password = crypto.AES.encrypt('1234qwer', aesKey).toString()
@@ -74,7 +75,7 @@ const login = async () => {
   if (data.code !== '200') {
     throw new Error(JSON.stringify(data))
   }
-  console.log('login success')
+  console.log('登录成功')
   cache.set(cache.KEYS.userid, data.data.userId)
   cache.set(cache.KEYS.token, data.data.token)
   cache.set(cache.KEYS.usersig, data.data.usersig)
@@ -101,7 +102,7 @@ const getDoctors = async () => {
     mRandstr: ''
   }
   const result = await axios.post(url, postData)
-  console.log('get department doctors')
+  console.log('获取医生列表')
   if (!result) {
     return []
   }
