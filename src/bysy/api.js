@@ -72,7 +72,7 @@ const login = async () => {
   const params = { username, password }
   const { data } = await axios.post(url, params)
   if (data.code !== '200') {
-    throw new Error(data)
+    throw new Error(JSON.stringify(data))
   }
   console.log('login success')
   cache.set(cache.KEYS.userid, data.data.userId)
@@ -108,7 +108,7 @@ const getDoctors = async () => {
 
   const data = decode(result.data, cache.get(cache.KEYS.token), postData.userId)
   if (data.code !== '200') {
-    throw new Error(data)
+    throw new Error(JSON.stringify(data))
   }
   doctors.data = data.data
   doctors.expire = Date.now() + 1000 * 60 * 30
@@ -131,7 +131,7 @@ const getSchedules = async (doctorId) => {
 
   const data = decode(result.data, cache.get(cache.KEYS.token), postData.userId)
   if (data.code !== '200') {
-    throw new Error(data)
+    throw new Error(JSON.stringify(data))
   }
   return data.data
 }
